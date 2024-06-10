@@ -1,10 +1,45 @@
 <script lang="ts">
 	import { TranslateResult, TranslaterChannels, translate } from '$lib/translate';
+	import { speechSynthesis } from '$lib/synth';
+	import { onMount } from 'svelte';
+	import { clipboard } from '@skeletonlabs/skeleton';
 
 	let q = '';
 	let lang = '';
 	let result: TranslateResult = new TranslateResult();
 	let error: any = undefined;
+
+	let synth = speechSynthesis;
+	let voices = synth.getVoices();
+	let voice = voices[0];
+	let boundary = '';
+
+	function start() {
+		voices.forEach((el) => {
+			if (el.Locale === result.tl) {
+				voice = el;
+			}
+		});
+		const utterance = new SpeechSynthesisUtterance(result.text);
+		utterance.lang = voice.Locale;
+		utterance.onstart = (e) => {
+			console.log(e);
+		};
+		utterance.onboundary = (e) => {
+			boundary = e.utterance.text.substring(0, e.charIndex + e.charLength);
+		};
+		utterance.onend = (e) => {
+			boundary = e.utterance.text;
+		};
+		synth.speak(utterance, voice);
+	}
+
+	onMount(() => {
+		synth.onvoiceschanged = () => {
+			voices = synth.getVoices();
+			voice = voices[0];
+		};
+	});
 
 	function trans() {
 		if (!lang) {
@@ -62,6 +97,7 @@
 		</div>
 		<div class="w-full text-left space-y-3 my-3">
 			{#if result.text}
+				<p>{voice.ShortName}:</p>
 				<div>
 					{#each result.origSens as sent, i}
 						<span id="orig-{i}">{sent}</span>
@@ -71,27 +107,10 @@
 					{#each result.tranSens as sent, i}
 						<span id="tran-{i}">{sent}</span>
 					{/each}
+					<button class="btn variant-filled" on:click={start}>Play</button>
+					<span data-clipboard="translateElement" class="hidden">{result.text}</span>
+					<button use:clipboard={{ element: 'translateElement' }}>Copy</button>
 				</div>
-				<!-- {#if result.dict}
-					{#each result.dict as word, i}
-						<p class="space-y-2">{i + 1}. {word.pos}</p>
-						<ol class="list-dl">
-							{#each word.entry as item}
-								<li class="my-1">
-									<span>{item.word}:</span>
-									{#each item.reverse_translation as rt}
-										<button
-											class="mx-1 badge variant-soft hover:variant-filled"
-											on:click={() => handleQueryWord(rt)}
-										>
-											<span>{rt}</span>
-										</button>
-									{/each}
-								</li>
-							{/each}
-						</ol>
-					{/each}
-				{/if} -->
 			{:else if error}
 				<p>{error}</p>
 			{:else}
@@ -115,7 +134,7 @@
 			pulse 5s cubic-bezier(0, 0, 0, 0.5) infinite,
 			glow 5s linear infinite;
 	}
-</style> -->
+</style>
 
 <style lang="postcss">
 	@keyframes glow {
@@ -137,4 +156,4 @@
 			transform: scale(1.5);
 		}
 	}
-</style>
+</style> -->
