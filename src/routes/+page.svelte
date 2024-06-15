@@ -79,11 +79,15 @@
 	function handleCopyTrans() {}
 
 	function handleSpeech() {
-		asrOfLocal(result.query, result.sl, onSpeechStart, onSpeechDone, onSpeechMatch, onSpeechError);
+		asrOfLocal(result.query, result.sl, onSpeechStart, onSpeechDelta, onSpeechDone, onSpeechMatch, onSpeechError);
 	}
 
 	function onSpeechStart() {
 		showProgressRadial = true;
+	}
+
+	function onSpeechDelta(text:string) {
+		speechText = text;		
 	}
 
 	function onSpeechDone(text: string): void {

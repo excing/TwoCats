@@ -2,7 +2,7 @@
 export function asrOfLocal(phrase: string,
   lang: string,
   onStart: () => void,
-  // onDelta: (text: string) => void,
+  onDelta: (text: string) => void,
   onDone: (text: string) => void,
   onMatch: (ok: boolean) => void,
   onError: (e: any) => void,
@@ -16,18 +16,19 @@ export function asrOfLocal(phrase: string,
 
   var grammar = '#JSGF V1.0; grammar phrase; public <phrase> = ' + phrase + ';';
   console.log(grammar);
-  
+
   var recognition = new SpeechRecognition();
   var speechRecognitionList = new SpeechGrammarList();
   speechRecognitionList.addFromString(grammar, 1);
   recognition.grammars = speechRecognitionList;
   recognition.lang = lang;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
 
   recognition.start();
 
   recognition.onresult = function (event: any /* SpeechRecognitionEvent */) {
+    console.log('SpeechRecognitionEvent: ', event.results);
     // The SpeechRecognitionEvent results property returns a SpeechRecognitionResultList object
     // The SpeechRecognitionResultList object contains SpeechRecognitionResult objects.
     // It has a getter so it can be accessed like an array
@@ -36,15 +37,20 @@ export function asrOfLocal(phrase: string,
     // These also have getters so they can be accessed like arrays.
     // The second [0] returns the SpeechRecognitionAlternative at position 0.
     // We then return the transcript property of the SpeechRecognitionAlternative object 
-    var speechResult = event.results[0][0].transcript;
-    onDone(speechResult);
-    if (speechResult.toLowerCase() === phrase) {
-      onMatch(true);
+    let isFinal = event.results[0].isFinal;
+    let speechResult = event.results[0][0].transcript;
+    if (isFinal) {
+      onDone(speechResult);
+      let s1 = removePunctuation(speechResult.toLowerCase());
+      let s2 = removePunctuation(phrase);
+      if (s1 === s2) {
+        onMatch(true);
+      } else {
+        onMatch(false);
+      }
     } else {
-      onMatch(false);
+      onDelta(speechResult);
     }
-
-    console.log('SpeechRecognitionEvent: ', event.results);
   }
 
   recognition.onspeechend = function () {
@@ -96,4 +102,12 @@ export function asrOfLocal(phrase: string,
     //Fired when the speech recognition service has begun listening to incoming audio with intent to recognize grammars associated with the current SpeechRecognition.
     console.log('SpeechRecognition.onstart');
   }
+}
+
+function removePunctuation(str: string) {
+  // 定义一个匹配所有标点符号的正则表达式
+  const punctuationRegex = /[\s',，.。!！/、"〞〝;:：@\[\]`{—}-~\?？]+/g;
+
+  // 使用 replace() 方法去掉标点符号
+  return str.replace(punctuationRegex, '');
 }
