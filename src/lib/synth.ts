@@ -50,9 +50,45 @@ type MSAudioMetadata = {
   }]
 }
 
-type SpeechSynthesisUtteranceExt = {
+type MSSpeechSynthesisEvent = {
+  type: string,
+  charIndex: number,
+  charLength: number,
+  elapsedTime: number,
+  name: string,
+  utterance: MSSpeechSynthesisUtterance,
+  currentTarget: HTMLElement,
+}
+
+export class MSSpeechSynthesisUtterance {
+  text: string;
+  lang: string = navigator.language;
+  pitch: number = 1.0;
+  rate: number = 1.0;
+  volume: number = 1.0;
+
+  constructor(text: string) {
+    this.text = text;
+  }
+
+  onend(e: MSSpeechSynthesisEvent) {
+    throw new Error("Method not implemented.");
+  }
+  onstart(e: MSSpeechSynthesisEvent) {
+    throw new Error("Method not implemented.");
+  }
+  onboundary(e: MSSpeechSynthesisEvent) {
+    throw new Error("Method not implemented.");
+  }
+  onerror(event: any) {
+    throw new Error("Method not implemented.");
+  }
+
+}
+
+type MSSpeechSynthesisUtteranceExt = {
   requestId: string;
-  utterance: SpeechSynthesisUtterance;
+  utterance: MSSpeechSynthesisUtterance;
   voice: MSVoice;
   buffer: ArrayBuffer[];
   metadatas: MSAudioMetadata[];
@@ -64,8 +100,8 @@ interface SpeechSynthesisEventInitExt extends SpeechSynthesisEventInit {
 
 class SpeechSynthesis {
   private voices: MSVoice[] = [];
-  private playUtteranceList: SpeechSynthesisUtteranceExt[] = [];
-  private waitUtteranceList: SpeechSynthesisUtteranceExt[] = [];
+  private playUtteranceList: MSSpeechSynthesisUtteranceExt[] = [];
+  private waitUtteranceList: MSSpeechSynthesisUtteranceExt[] = [];
 
   onvoiceschanged: () => void = () => { };
 
@@ -183,7 +219,7 @@ class SpeechSynthesis {
     }
   }
 
-  private getPlayUtterance(requestId: string): { index: number, ext: SpeechSynthesisUtteranceExt } {
+  private getPlayUtterance(requestId: string): { index: number, ext: MSSpeechSynthesisUtteranceExt } {
     for (let index = 0; index < this.playUtteranceList.length; index++) {
       const element = this.playUtteranceList[index];
       if (element.requestId === requestId) {
@@ -209,7 +245,7 @@ class SpeechSynthesis {
 
   }
 
-  speak(utterance: SpeechSynthesisUtterance, voice: MSVoice): void {
+  speak(utterance: MSSpeechSynthesisUtterance, voice: MSVoice): void {
     let waitUtteranceListLength = this.waitUtteranceList.length;
     this.waitUtteranceList[waitUtteranceListLength] = {
       requestId: generateRandomHex(),
@@ -220,7 +256,7 @@ class SpeechSynthesis {
     };
     this.connectSocket((e) => {
       if (utterance.onerror) {
-        let event: SpeechSynthesisErrorEvent = {
+        let event: any = {
           error: e,
         }
         utterance.onerror(event);
@@ -246,19 +282,22 @@ class SpeechSynthesis {
           return false;
         });
         if (md && ext.utterance.onboundary) {
-          ext.utterance.onboundary(new SpeechSynthesisEvent('boundary', {
+          let event: MSSpeechSynthesisEvent = {
+            type: 'boundary',
             charIndex: wordIndex,
             charLength: md.Metadata[0].Data.text.Length,
             elapsedTime: md.Metadata[0].Data.Duration,
             name: md.Metadata[0].Type,
             utterance: ext.utterance,
-          }))
+            currentTarget: audio,
+          }
+          ext.utterance.onboundary(event);
         }
       },
       onBufferStart: (requestId, audio) => {
         let { index, ext } = this.getPlayUtterance(requestId);
         if (ext.utterance.onstart) {
-          let event: SpeechSynthesisEvent = {
+          let event: MSSpeechSynthesisEvent = {
             type: 'start',
             charIndex: 0,
             charLength: 0,
@@ -274,19 +313,22 @@ class SpeechSynthesis {
         let ts = audio.duration * 10000000;
         let { index, ext } = this.getPlayUtterance(requestId);
         if (ext.utterance.onend) {
-          ext.utterance.onend(new SpeechSynthesisEvent('end', {
+          let event: MSSpeechSynthesisEvent = {
+            type: 'end',
             charIndex: 0,
             charLength: ext.utterance.text.length,
             elapsedTime: ts,
             name: 'TextBoundary',
             utterance: ext.utterance,
-          }));
+            currentTarget: audio,
+          }
+          ext.utterance.onend(event);
         }
       }
     });
   }
 
-  private send(ext: SpeechSynthesisUtteranceExt) {
+  private send(ext: MSSpeechSynthesisUtteranceExt) {
     let socket = this.socket;
     if (socket && socket.readyState == WebSocket.OPEN) {
       const requestId = ext.requestId;

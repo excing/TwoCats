@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { TranslateResult, TranslaterChannels, translate } from '$lib/translate';
-	import { speechSynthesis } from '$lib/synth';
+	import { speechSynthesis, MSSpeechSynthesisUtterance } from '$lib/synth';
 	import { asrOfLocal } from '$lib/asr';
 	import { langEq } from '$lib/index';
 	import { onMount } from 'svelte';
@@ -25,7 +25,7 @@
 	function play() {
 		showProgressRadial = true;
 		voice = voices.find((v) => langEq(v.Locale, result.sl)) || voices[0];
-		const utterance = new SpeechSynthesisUtterance(result.query);
+		const utterance = new MSSpeechSynthesisUtterance(result.query);
 		utterance.lang = voice.Locale;
 		utterance.onstart = (e) => {
 			showProgressRadial = false;
