@@ -7,3 +7,16 @@ declare namespace App {
 	// interface Error {}
 	// interface Platform {}
 }
+
+declare global {
+	interface Window {
+		SpeechRecognition: any;
+		webkitSpeechRecognition: any;
+		SpeechGrammarList: any;
+		webkitSpeechGrammarList: any;
+		SpeechRecognitionEvent: any;
+		webkitSpeechRecognitionEvent: any;
+	}
+}
+
+export { };

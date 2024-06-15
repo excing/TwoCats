@@ -55,13 +55,13 @@ export function edgeBrowserTranslate(q: string, sl: string, tl: string) {
     result.query = q;
     result.sl = sl;
     result.tl = tl;
-    if (!data || data.lenght === 0) return result;
+    if (!data || data.length === 0) return result;
     let translations = data[0].translations;
     if (!translations || !translations[0]) return result;
     let translation = translations[0];
     result.text = translation.text;
     result.tl = translation.to;
-    result.sentCount = translation.sentLen.srcSentLen.lenght;
+    result.sentCount = translation.sentLen.srcSentLen.length;
     for (let index = 0; index < result.sentCount; index++) {
       let srcSentStart = index == 0 ? 0 : translation.sentLen.srcSentLen[index - 1];
       let srcSentEnd = translation.sentLen.srcSentLen[index];
