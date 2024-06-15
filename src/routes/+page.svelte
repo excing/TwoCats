@@ -2,6 +2,7 @@
 	import { TranslateResult, TranslaterChannels, translate } from '$lib/translate';
 	import { speechSynthesis } from '$lib/synth';
 	import { asrOfLocal } from '$lib/asr';
+	import { langEq } from '$lib/index';
 	import { onMount } from 'svelte';
 	import { clipboard } from '@skeletonlabs/skeleton';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
@@ -23,12 +24,8 @@
 
 	function play() {
 		showProgressRadial = true;
-		voices.forEach((el) => {
-			if (el.Locale === result.tl) {
-				voice = el;
-			}
-		});
-		const utterance = new SpeechSynthesisUtterance(result.text);
+		voice = voices.find((v) => langEq(v.Locale, result.sl)) || voices[0];
+		const utterance = new SpeechSynthesisUtterance(result.query);
 		utterance.lang = voice.Locale;
 		utterance.onstart = (e) => {
 			showProgressRadial = false;
@@ -79,15 +76,23 @@
 	function handleCopyTrans() {}
 
 	function handleSpeech() {
-		asrOfLocal(result.query, result.sl, onSpeechStart, onSpeechDelta, onSpeechDone, onSpeechMatch, onSpeechError);
+		asrOfLocal(
+			result.query,
+			result.sl,
+			onSpeechStart,
+			onSpeechDelta,
+			onSpeechDone,
+			onSpeechMatch,
+			onSpeechError
+		);
 	}
 
 	function onSpeechStart() {
 		showProgressRadial = true;
 	}
 
-	function onSpeechDelta(text:string) {
-		speechText = text;		
+	function onSpeechDelta(text: string) {
+		speechText = text;
 	}
 
 	function onSpeechDone(text: string): void {
@@ -115,9 +120,6 @@
 			<button class="variant-filled-secondary" on:click={trans}>Submit</button>
 		</div>
 		<div class="w-full flex space-x-2">
-			<a class="btn variant-filled" href="https://skeleton.dev/" target="_blank" rel="noreferrer">
-				我想学习
-			</a>
 			<button class="btn variant-filled" on:click={handleSpeech}> 背单词 </button>
 			{#if showProgressRadial}
 				<ProgressRadial width="w-10" />
@@ -130,12 +132,12 @@
 					{#each result.origSens as sent, i}
 						<span id="orig-{i}">{sent}</span>
 					{/each}
+					<button class="btn variant-filled" on:click={play}>Play</button>
 				</div>
 				<div>
 					{#each result.tranSens as sent, i}
 						<span id="tran-{i}">{sent}</span>
 					{/each}
-					<button class="btn variant-filled" on:click={play}>Play</button>
 					<span data-clipboard="translateElement" class="hidden">{result.text}</span>
 					<button use:clipboard={{ element: 'translateElement' }}>Copy</button>
 				</div>

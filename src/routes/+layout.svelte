@@ -9,7 +9,7 @@
 		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">TwoCats</strong>
+				<strong class="text-3xl uppercase">🐱🐱</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
