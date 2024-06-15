@@ -16,6 +16,10 @@ declare global {
 		webkitSpeechGrammarList: any;
 		SpeechRecognitionEvent: any;
 		webkitSpeechRecognitionEvent: any;
+		SpeechSynthesisUtterance: any;
+		SpeechSynthesisErrorEvent: any;
+		SpeechSynthesisEvent: any;
+		SpeechSynthesisUtteranceExt: any;
 	}
 }
 
