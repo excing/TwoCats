@@ -8,6 +8,11 @@ declare namespace App {
 	// interface Platform {}
 }
 
+declare namespace SpeechSynthesisUtterance {}
+declare namespace SpeechSynthesisErrorEvent {}
+declare namespace SpeechSynthesisEvent {}
+declare namespace SpeechSynthesisUtteranceExt {}
+
 declare global {
 	interface Window {
 		SpeechRecognition: any;
@@ -16,10 +21,6 @@ declare global {
 		webkitSpeechGrammarList: any;
 		SpeechRecognitionEvent: any;
 		webkitSpeechRecognitionEvent: any;
-		SpeechSynthesisUtterance: any;
-		SpeechSynthesisErrorEvent: any;
-		SpeechSynthesisEvent: any;
-		SpeechSynthesisUtteranceExt: any;
 	}
 }
 
