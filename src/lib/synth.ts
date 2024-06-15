@@ -93,7 +93,7 @@ class SpeechSynthesis {
   constructor() {
   }
 
-  private connectSocket() {
+  private connectSocket(onerror: (e: any) => void) {
     if (this.socket &&
       (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) return;
 
@@ -119,6 +119,7 @@ class SpeechSynthesis {
 
     _socket.onerror = (event) => {
       console.error('WebSocket 连接出错：', event);
+      onerror(event.type)
       clearInterval(this.sendInterval);
     };
 
@@ -217,7 +218,14 @@ class SpeechSynthesis {
       buffer: [],
       metadatas: [],
     };
-    this.connectSocket();
+    this.connectSocket((e) => {
+      if (utterance.onerror) {
+        let event: SpeechSynthesisErrorEvent = {
+          error: e,
+        }
+        utterance.onerror(event);
+      }
+    });
     // this.sendAll();
     streamPlayer.connectAudioPlayer({
       onTimeUpdate: (requestId, audio) => {

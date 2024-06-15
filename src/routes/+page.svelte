@@ -37,6 +37,10 @@
 			boundary = e.utterance.text;
 			showProgressRadial = false;
 		};
+		utterance.onerror = (e) => {
+			error = e.error;
+			showProgressRadial = false;
+		};
 		synth.speak(utterance, voice);
 	}
 
@@ -141,14 +145,15 @@
 					<span data-clipboard="translateElement" class="hidden">{result.text}</span>
 					<button use:clipboard={{ element: 'translateElement' }}>Copy</button>
 				</div>
-			{:else if error}
-				<p>{error}</p>
 			{:else}
 				<p>NO RESULT</p>
 			{/if}
 			{#if speechText}
 				<p>{speechText}</p>
 				<p>{speechMatch}</p>
+			{/if}
+			{#if error}
+				<p>{error}</p>
 			{/if}
 		</div>
 	</div>
