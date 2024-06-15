@@ -9,7 +9,7 @@
 		<!-- App Bar -->
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<strong class="text-xl uppercase">TwoCat</strong>
+				<strong class="text-xl uppercase">TwoCats</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a
@@ -22,7 +22,7 @@
 				</a>
 				<a
 					class="btn btn-sm variant-ghost-surface"
-					href="https://github.com/excing/TwoCat"
+					href="https://github.com/excing/TwoCats"
 					target="_blank"
 					rel="noreferrer"
 				>

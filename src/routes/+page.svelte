@@ -105,9 +105,10 @@
 	}
 </script>
 
+<title>🐈2Cats🐱 —— 一个多语言学习 APP</title>
 <div class="container h-full mx-auto flex justify-center">
 	<div class="space-y-10 text-center flex flex-col items-center w-9/12">
-		<h2 class="h2">Welcome to TwoCat.</h2>
+		<h2 class="h2">Welcome to TwoCats.</h2>
 		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
 			<div class="input-group-shim"><span class="text-xl">🔍</span></div>
 			<input type="search" placeholder="Search..." bind:value={q} on:keypress={handleKeydown} />
