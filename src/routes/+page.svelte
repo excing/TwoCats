@@ -6,6 +6,17 @@
 	import { onMount } from 'svelte';
 	import { clipboard } from '@skeletonlabs/skeleton';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
+	import { initializeStores, getModalStore, Modal } from '@skeletonlabs/skeleton';
+	import { type ModalSettings, type ModalComponent } from '@skeletonlabs/skeleton';
+
+	import ModalComponentOne from '$lib/modals/ModalSetting.svelte';
+
+	const modalRegistry: Record<string, ModalComponent> = {
+		// Set a unique modal ID, then pass the component reference
+		modalComponentOne: { ref: ModalComponentOne }
+		// modalComponentTwo: { ref: ModalComponentTwo }
+		// ...
+	};
 
 	let q = '';
 	let lang = '';
@@ -21,6 +32,10 @@
 	let speechMatch = false;
 
 	let showProgressRadial = false;
+
+	initializeStores();
+
+	const modalStore = getModalStore();
 
 	function play() {
 		showProgressRadial = true;
@@ -50,6 +65,17 @@
 			voice = voices[0];
 		};
 	});
+
+	function handleTest() {
+		const modal: ModalSettings = {
+			type: 'component',
+			// Data
+			component: 'modalComponentOne',
+			title: '欢迎使用两只猫',
+			body: '初次使用，请先简单的设置一下你的语言和昵称.'
+		};
+		modalStore.trigger(modal);
+	}
 
 	function trans() {
 		if (!lang) {
@@ -118,13 +144,13 @@
 <div class="container h-full mx-auto flex justify-center">
 	<div class="space-y-10 text-center flex flex-col items-center w-9/12">
 		<h2 class="h2">Welcome to TwoCats.</h2>
-		<div class="input-group input-group-divider grid-cols-[auto_1fr_auto]">
-			<div class="input-group-shim"><span class="text-xl">🔍</span></div>
+		<div class="input-group input-group-divider grid-cols-[1fr_auto]">
 			<input type="search" placeholder="Search..." bind:value={q} on:keypress={handleKeydown} />
-			<button class="variant-filled-secondary" on:click={trans}>Submit</button>
+			<button class="variant-filled-primary" on:click={trans}>🔍</button>
 		</div>
 		<div class="w-full flex space-x-2">
 			<button class="btn variant-filled" on:click={handleSpeech}> 背单词 </button>
+			<button class="btn variant-filled" on:click={handleTest}> (TEST) </button>
 			{#if showProgressRadial}
 				<ProgressRadial width="w-10" />
 			{/if}
@@ -143,7 +169,9 @@
 						<span id="tran-{i}">{sent}</span>
 					{/each}
 					<span data-clipboard="translateElement" class="hidden">{result.text}</span>
-					<button use:clipboard={{ element: 'translateElement' }}>Copy</button>
+					<button class="btn variant-filled" use:clipboard={{ element: 'translateElement' }}
+						>Copy</button
+					>
 				</div>
 			{:else}
 				<p>NO RESULT</p>
@@ -157,4 +185,5 @@
 			{/if}
 		</div>
 	</div>
+	<Modal components={modalRegistry} />
 </div>
