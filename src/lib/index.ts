@@ -9,7 +9,7 @@ export const langEq = (lang1: string, lang2: string) => {
 };
 
 export const LANGUAGES: [string, string][] = [
-  ["auto", "auto"],
+  // ["auto", "auto"],
   ["zh-CN", "zh-CN"],
   ["zh-TW", "zh-TW"],
   ["en", "en"],

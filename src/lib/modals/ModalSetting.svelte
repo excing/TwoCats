@@ -16,8 +16,8 @@
 	// Form Data
 	const formData = {
 		name: '',
-		sl: displayNames.of(navigator.language),
-		tl: ''
+		sl: navigator.language,
+		tl: 'en'
 	};
 
   let langs = LANGUAGES;
@@ -57,11 +57,9 @@
 			<label class="label">
 				<span>你想学习或翻译的语言</span>
 				<select class="select" bind:value={formData.tl}>
-					<option value="1">Option 1</option>
-					<option value="2">Option 2</option>
-					<option value="3">Option 3</option>
-					<option value="4">Option 4</option>
-					<option value="5">Option 5</option>
+					{#each langs as v, i}
+						<option value={v[0]}>{displayNames.of(v[0])}</option>
+					{/each}
 				</select>
 			</label>
 		</form>
