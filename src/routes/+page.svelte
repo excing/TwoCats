@@ -24,7 +24,7 @@
 	let error: any = undefined;
 
 	let synth = speechSynthesis;
-	let voices = synth.getVoices();
+	let voices = synth.getDefaultVoice();
 	let voice = voices[0];
 	let boundary = '';
 
@@ -60,6 +60,7 @@
 	}
 
 	onMount(() => {
+		voices = synth.getVoices();
 		synth.onvoiceschanged = () => {
 			voices = synth.getVoices();
 			voice = voices[0];
@@ -72,7 +73,11 @@
 			// Data
 			component: 'modalComponentOne',
 			title: '欢迎使用两只猫',
-			body: '初次使用，请先简单的设置一下你的语言和昵称.'
+			body: '初次使用，请先简单的设置一下你的语言和昵称.',
+			meta: {
+				ms_readers: voices
+			},
+			response: (r: string) => console.log('response:', r),
 		};
 		modalStore.trigger(modal);
 	}

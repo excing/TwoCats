@@ -12,6 +12,7 @@ export const LANGUAGES: [string, string][] = [
   // ["auto", "auto"],
   ["zh-CN", "zh-CN"],
   ["zh-TW", "zh-TW"],
+  ["zh-HK", "zh-HK"],
   ["en", "en"],
   ["af", "af"],
   ["am", "am"],

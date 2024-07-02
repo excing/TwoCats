@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { TranslaterChannels, translate } from '$lib/translate';
+	import { speechSynthesis, MSSpeechSynthesisUtterance, type MSVoice } from '$lib/synth';
 	import type { SvelteComponent } from 'svelte';
 
 	// Stores
@@ -17,10 +19,75 @@
 	const formData = {
 		name: '',
 		sl: navigator.language,
-		tl: 'en'
+		svoice: {},
+		tl: 'en',
+		tvoice: {}
 	};
 
-  let langs = LANGUAGES;
+	let langs = LANGUAGES;
+
+	$: slregex = new RegExp(formData.sl.length == 2 ? `${formData.sl}-` : formData.sl, 'g');
+	$: slmatches = (item: any) => (slregex ? slregex.test(item.Locale) : true);
+
+	$: regex = new RegExp(formData.tl.length == 2 ? `${formData.tl}-` : formData.tl, 'g');
+	$: matches = (item: any) => (regex ? regex.test(item.Locale) : true);
+
+	function getReaderName(shortName: string, locale: string) {
+		let name = shortName.substring(0, shortName.length - 6);
+		return name.substring(locale.length + 1);
+	}
+
+	function getReaderShowName(item: any) {
+		let lang = displayNames.of(item.Locale);
+		let gender = item.Gender === 'Male' ? '♂' : '♀';
+		let shortName = getReaderName(item.ShortName, item.Locale);
+		return `${gender} ${shortName} - ${lang}`;
+	}
+
+	function handleSrcTryListen() {
+		handleTryListen(formData.svoice)
+	}
+
+	function handleTarTryListen() {
+		handleTryListen(formData.tvoice)
+	}
+
+	function isMSVoice(voice: any): voice is MSVoice {
+		return (
+			typeof voice.ShortName === 'string' &&
+			typeof voice.Gender === 'string' &&
+			typeof voice.Locale === 'string' &&
+			typeof voice.FriendlyName === 'string' &&
+			typeof voice.SuggestedCodec === 'string'
+		);
+	}
+
+	function handleTryListen(voice: any) {
+		if (isMSVoice(voice)) {
+			let readerName: string = getReaderName(voice.ShortName, voice.Locale);
+			translate(
+				`Hello, my name is ${readerName}, this is a preview audio, welcome to use the Two Cats APP.`,
+				'en',
+				voice.Locale,
+				TranslaterChannels.Edge
+			)
+				.then((data) => {
+					playTryListen(voice, data.text);
+				})
+				.catch((e) => {});
+		}
+	}
+
+	function playTryListen(voice: any, text: string) {
+		if (isMSVoice(voice)) {
+			const utterance = new MSSpeechSynthesisUtterance(text);
+			utterance.lang = voice.Locale;
+			utterance.onstart = (e) => {};
+			utterance.onboundary = (e) => {};
+			utterance.onend = (e) => {};
+			speechSynthesis.speak(utterance, voice);
+		}
+	}
 
 	// We've created a custom submit function to pass the response and close the modal.
 	function onFormSubmit(): void {
@@ -55,6 +122,15 @@
 				</select>
 			</label>
 			<label class="label">
+				<span>母语朗读人</span>
+				<select class="select" bind:value={formData.svoice}>
+					{#each $modalStore[0].meta.ms_readers.filter(slmatches) as v, i}
+						<option value={v}> {getReaderShowName(v)}</option>
+					{/each}
+				</select>
+			</label>
+			<button class="btn variant-filled" on:click={handleSrcTryListen}>试听 ▶</button>
+			<label class="label">
 				<span>你想学习或翻译的语言</span>
 				<select class="select" bind:value={formData.tl}>
 					{#each langs as v, i}
@@ -62,6 +138,15 @@
 					{/each}
 				</select>
 			</label>
+			<label class="label">
+				<span>目标朗读人</span>
+				<select class="select" bind:value={formData.tvoice}>
+					{#each $modalStore[0].meta.ms_readers.filter(matches) as v, i}
+						<option value={v}> {getReaderShowName(v)}</option>
+					{/each}
+				</select>
+			</label>
+			<button class="btn variant-filled" on:click={handleTarTryListen}>试听 ▶</button>
 		</form>
 		<!-- prettier-ignore -->
 		<footer class="modal-footer {parent.regionFooter}">

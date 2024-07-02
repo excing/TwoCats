@@ -24,7 +24,7 @@ const MS_TTS_HEADER = `Content-Type:application/json; charset=utf-8\r\nPath:spee
     }
 }`
 
-type MSVoice = {
+export type MSVoice = {
   Name: string;
   ShortName: string;
   Gender: string;
@@ -104,6 +104,10 @@ class SpeechSynthesis {
   private waitUtteranceList: MSSpeechSynthesisUtteranceExt[] = [];
 
   onvoiceschanged: () => void = () => { };
+
+  getDefaultVoice(): MSVoice[] {
+    return this.voices;
+  }
 
   getVoices(): MSVoice[] {
     let voices = this.voices;
