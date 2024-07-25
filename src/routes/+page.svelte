@@ -11,6 +11,8 @@
 
 	import ModalComponentOne from '$lib/modals/ModalSetting.svelte';
 
+	import { saveUserSettings, getUserSettings } from "$lib/db";
+
 	const modalRegistry: Record<string, ModalComponent> = {
 		// Set a unique modal ID, then pass the component reference
 		modalComponentOne: { ref: ModalComponentOne }
@@ -75,9 +77,10 @@
 			title: '欢迎使用两只猫',
 			body: '初次使用，请先简单的设置一下你的语言和昵称.',
 			meta: {
-				ms_readers: voices
+				ms_readers: voices,
+				save_form: getUserSettings(),
 			},
-			response: (r: string) => console.log('response:', r),
+			response: (r: any) => saveUserSettings(r),
 		};
 		modalStore.trigger(modal);
 	}
