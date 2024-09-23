@@ -1,75 +1,98 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { Message, User } from '$lib/entity';
+	import { randomUUID } from '$lib/utils';
+	import { Avatar } from '@skeletonlabs/skeleton';
+	import DateTimeText from '$lib/components/DateTimeText.svelte';
+	import UserCommandInput from '$lib/components/UserCommandInput.svelte';
+	import { displayLangName, LANGUAGES } from '$lib';
+
+	let systemUid = randomUUID();
+	let userId = randomUUID();
+	let cid = randomUUID();
+	let userMessage = '';
+	let langs: string[] = [];
+
+	const _01 = [
+		'欢迎使用两猫多语言学习和查询 APP, 我们使用对话的形式完成所有操作，比如学习、查询、翻译等，希望可以带给你一些不一样的使用体验。',
+		'现在，请先选择你日常使用的语言。'
+	];
+
+	let messages: Message[] = [];
+
+	let elemChat: HTMLElement;
+
+	onMount(() => {
+		elemChat.style.maxHeight = `${elemChat.clientHeight}px`;
+
+		let system = new User();
+		system.id = systemUid;
+		system.name = 'SYSTEM';
+		for (let i = 0; i < _01.length; i++) {
+			const element = _01[i];
+			let msg = new Message(cid, system);
+			msg.content = element;
+			messages = [...messages, msg];
+		}
+
+		for (let i = 0; i < LANGUAGES.length; i++) {
+			const el = LANGUAGES[i];
+			langs = [...langs, displayLangName(navigator.language, el[0])];
+		}
+	});
+
+	function scrollChatBottom(behavior?: ScrollBehavior): void {
+		elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
+	}
+
+	function onSendUserMessage() {
+		let user = new User();
+		user.id = userId;
+		user.name = 'USER';
+		let msg = new Message(cid, user);
+		msg.content = userMessage;
+		messages = [...messages, msg];
+		// 用户输入框清空
+		userMessage = '';
+		// 消息列表置底
+		setTimeout(() => {
+			scrollChatBottom('smooth');
+		}, 0);
+	}
 </script>
 
 <title>🐈2Cats🐱 —— 一个多语言学习 APP</title>
-<div class="flex h-full	">
+<div class="flex h-full">
 	<div class="flex-1"></div>
-	<div style="width: 680px;" class="flex flex-col h-full	">
-    <div class="flex-1">Hello</div>
-		<div class="flex items-end my-4">
-      <button type='button' class="btn-icon variant-filled-secondary mx-1">🛠</button>
-			<div
-				class="enterSomeContentStyle textarea"
-				contenteditable="true"
-				placeholder="Enter some long form content."
-			></div>
-      <button type='button' class="btn-icon variant-filled-secondary mx-1">OK</button>
+	<div style="width: 680px;" class="flex flex-col h-full p-2 space-y-4">
+		<div class="flex-1 overflow-y-auto space-y-4" bind:this={elemChat}>
+			{#each messages as { user, content, time }}
+				{#if user.id === userId}
+					<div class="grid grid-cols-[1fr_auto] gap-2">
+						<div class="card p-4 rounded-tr-none space-y-2 variant-ghost-primary">
+							<header class="flex justify-between items-center">
+								<p class="font-bold">{user.name}</p>
+								<DateTimeText {time}></DateTimeText>
+							</header>
+							<p>{content}</p>
+						</div>
+						<Avatar src="/favicon.png" width="w-12" />
+					</div>
+				{:else}
+					<div class="grid grid-cols-[auto_1fr] gap-2">
+						<Avatar src="/favicon.png" width="w-12" />
+						<div class="card p-4 rounded-tl-none space-y-2 variant-ghost-surface">
+							<header class="flex justify-between items-center">
+								<p class="font-bold">{user.name}</p>
+								<DateTimeText {time}></DateTimeText>
+							</header>
+							<p>{content}</p>
+						</div>
+					</div>
+				{/if}
+			{/each}
 		</div>
+		<UserCommandInput commandList={langs} bind:userMessage />
 	</div>
 	<div class="flex-1"></div>
 </div>
-
-<style>
-	.enterSomeContentStyle {
-		background-color: rgb(var(--color-surface-700));
-		border-color: rgb(var(--color-surface-500));
-		border-radius: var(--theme-rounded-container);
-		width: 100%;
-    height: auto;
-    max-height: 140px;
-    overflow: auto;
-		transition-property:
-			color,
-			background-color,
-			border-color,
-			text-decoration-color,
-			fill,
-			stroke,
-			opacity,
-			box-shadow,
-			transform,
-			filter,
-			backdrop-filter,
-			-webkit-backdrop-filter;
-		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-		transition-duration: 200ms;
-		border-width: var(--theme-border-base);
-		padding-top: 0.5rem;
-		padding-right: 0.75rem;
-		padding-bottom: 0.5rem;
-		padding-left: 0.75rem;
-		font-size: 1rem;
-		line-height: 1.5rem;
-		--tw-shadow: 0 0 #0000;
-		appearance: none;
-		resize: vertical;
-		font-family: inherit;
-		font-feature-settings: inherit;
-		font-variation-settings: inherit;
-		font-weight: inherit;
-		letter-spacing: inherit;
-		color: inherit;
-		margin: 0;
-		--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width)
-			var(--tw-ring-offset-color) !important;
-		--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width))
-			var(--tw-ring-color) !important;
-		box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000) !important;
-		outline: none;
-	}
-
-	.enterSomeContentStyle:empty::before {
-		content: attr(placeholder);
-    color: rgb(201, 201, 201);
-	}
-</style>

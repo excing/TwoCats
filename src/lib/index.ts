@@ -8,6 +8,20 @@ export const langEq = (lang1: string, lang2: string) => {
   return langStr1 === langStr2;
 };
 
+let displayNames: Intl.DisplayNames;
+
+export function initDisplayNames(locales: string) {
+  displayNames = new Intl.DisplayNames([locales], { type: 'language' });
+}
+
+export function displayLangName(locales: string, lang: string) {
+  if (!displayNames) {
+    displayNames = new Intl.DisplayNames([locales], { type: 'language' });
+  }
+
+  return displayNames.of(lang) || lang;
+}
+
 export const LANGUAGES: [string, string][] = [
   // ["auto", "auto"],
   ["zh-CN", "zh-CN"],
