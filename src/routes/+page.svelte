@@ -4,14 +4,15 @@
 	import { randomUUID } from '$lib/utils';
 	import { Avatar } from '@skeletonlabs/skeleton';
 	import DateTimeText from '$lib/components/DateTimeText.svelte';
-	import UserCommandInput from '$lib/components/UserCommandInput.svelte';
-	import { displayLangName, LANGUAGES } from '$lib';
+	import UserContentInput from '$lib/components/UserContentInput.svelte';
+	import { UserInputTypes } from '$lib/components/Types';
 
 	let systemUid = randomUUID();
 	let userId = randomUUID();
 	let cid = randomUUID();
 	let userMessage = '';
-	let langs: string[] = [];
+
+	let userInputType = UserInputTypes.UserTranslate;
 
 	const _01 = [
 		'欢迎使用两猫多语言学习和查询 APP, 我们使用对话的形式完成所有操作，比如学习、查询、翻译等，希望可以带给你一些不一样的使用体验。',
@@ -35,29 +36,26 @@
 			messages = [...messages, msg];
 		}
 
-		for (let i = 0; i < LANGUAGES.length; i++) {
-			const el = LANGUAGES[i];
-			langs = [...langs, displayLangName(navigator.language, el[0])];
-		}
+		userInputType = UserInputTypes.UserSelectMainLanguage;
 	});
 
 	function scrollChatBottom(behavior?: ScrollBehavior): void {
 		elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
 	}
 
-	function onSendUserMessage() {
+	function onUserContent(event: CustomEvent) {
 		let user = new User();
 		user.id = userId;
 		user.name = 'USER';
 		let msg = new Message(cid, user);
-		msg.content = userMessage;
+		msg.content = event.detail.content.name;
 		messages = [...messages, msg];
-		// 用户输入框清空
-		userMessage = '';
 		// 消息列表置底
 		setTimeout(() => {
 			scrollChatBottom('smooth');
 		}, 0);
+
+		userInputType = UserInputTypes.UserSearchWord;
 	}
 </script>
 
@@ -92,7 +90,7 @@
 				{/if}
 			{/each}
 		</div>
-		<UserCommandInput commandList={langs} bind:userMessage />
+		<UserContentInput bind:type={userInputType} bind:userMessage on:content={onUserContent} />
 	</div>
 	<div class="flex-1"></div>
 </div>
