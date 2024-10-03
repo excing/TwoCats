@@ -2,21 +2,20 @@
 	import { onMount } from 'svelte';
 	import { Message, User } from '$lib/entity';
 	import { randomUUID } from '$lib/utils';
-	import { Avatar } from '@skeletonlabs/skeleton';
-	import DateTimeText from '$lib/components/DateTimeText.svelte';
 	import UserContentInput from '$lib/components/UserContentInput.svelte';
 	import { UserInputTypes } from '$lib/components/Types';
+	import TextChat from '$lib/components/TextChat.svelte';
 
 	let systemUid = randomUUID();
 	let userId = randomUUID();
 	let cid = randomUUID();
 	let userMessage = '';
 
-	let userInputType = UserInputTypes.UserTranslate;
+	let userInputType = UserInputTypes.UserSettings;
 
 	const _01 = [
 		'欢迎使用两猫多语言学习和查询 APP, 我们使用对话的形式完成所有操作，比如学习、查询、翻译等，希望可以带给你一些不一样的使用体验。',
-		'现在，请先选择你日常使用的语言。'
+		'现在，请先完成一些简单的设置。'
 	];
 
 	let messages: Message[] = [];
@@ -35,8 +34,6 @@
 			msg.content = element;
 			messages = [...messages, msg];
 		}
-
-		userInputType = UserInputTypes.UserSelectMainLanguage;
 	});
 
 	function scrollChatBottom(behavior?: ScrollBehavior): void {
@@ -65,29 +62,13 @@
 	<div style="width: 680px;" class="flex flex-col h-full p-2 space-y-4">
 		<div class="flex-1 overflow-y-auto space-y-4" bind:this={elemChat}>
 			{#each messages as { user, content, time }}
-				{#if user.id === userId}
-					<div class="grid grid-cols-[1fr_auto] gap-2">
-						<div class="card p-4 rounded-tr-none space-y-2 variant-ghost-primary">
-							<header class="flex justify-between items-center">
-								<p class="font-bold">{user.name}</p>
-								<DateTimeText {time}></DateTimeText>
-							</header>
-							<p>{content}</p>
-						</div>
-						<Avatar src="/favicon.png" width="w-12" />
-					</div>
-				{:else}
-					<div class="grid grid-cols-[auto_1fr] gap-2">
-						<Avatar src="/favicon.png" width="w-12" />
-						<div class="card p-4 rounded-tl-none space-y-2 variant-ghost-surface">
-							<header class="flex justify-between items-center">
-								<p class="font-bold">{user.name}</p>
-								<DateTimeText {time}></DateTimeText>
-							</header>
-							<p>{content}</p>
-						</div>
-					</div>
-				{/if}
+				<TextChat
+					dir={user.id === userId ? 0 : 1}
+					username={user.name}
+					{time}
+					avatar="/favicon.png"
+					{content}
+				/>
 			{/each}
 		</div>
 		<UserContentInput bind:type={userInputType} bind:userMessage on:content={onUserContent} />

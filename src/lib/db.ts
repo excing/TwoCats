@@ -1,11 +1,16 @@
 const Key_userSettings = 'userSettings';
 
 export function saveUserSettings(settings: any) {
-  localStorage.setItem(Key_userSettings, settings);
+  let _settings = JSON.stringify(settings);
+  localStorage.setItem(Key_userSettings, _settings);
 }
 
 export function getUserSettings() {
-  return localStorage.getItem(Key_userSettings);
+  let _settings = localStorage.getItem(Key_userSettings);
+  if (_settings) {
+    return JSON.parse(_settings);
+  }
+  return false;
 }
 
 class TwoCatsDB {

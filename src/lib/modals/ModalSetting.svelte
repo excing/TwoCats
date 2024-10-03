@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { TranslaterChannels, translate } from '$lib/translate';
 	import { speechSynthesis, MSSpeechSynthesisUtterance, type MSVoice } from '$lib/synth';
-	import type { SvelteComponent } from 'svelte';
+	import { onMount, type SvelteComponent } from 'svelte';
 
 	// Stores
 	import { getModalStore } from '@skeletonlabs/skeleton';
@@ -24,6 +24,12 @@
 		tvoice: {}
 	};
 
+	let svoice = '';
+	let tvoice = '';
+
+	let synth = speechSynthesis;
+	let voices = synth.getDefaultVoice();
+
 	let langs = LANGUAGES;
 
 	$: slregex = new RegExp(formData.sl.length == 2 ? `${formData.sl}-` : formData.sl, 'g');
@@ -31,6 +37,25 @@
 
 	$: regex = new RegExp(formData.tl.length == 2 ? `${formData.tl}-` : formData.tl, 'g');
 	$: matches = (item: any) => (regex ? regex.test(item.Locale) : true);
+
+	onMount(() => {
+		voices = synth.getVoices();
+		synth.onvoiceschanged = () => {
+			voices = synth.getVoices();
+		};
+
+		let _form = $modalStore[0].meta.save_form;
+		if (_form && _form !== 'false') {
+			formData.name = _form.name;
+			formData.sl = _form.sl;
+			formData.svoice = _form.svoice;
+			formData.tl = _form.tl;
+			formData.tvoice = _form.tvoice;
+
+			if (isMSVoice(formData.svoice)) svoice = formData.svoice.Name;
+			if (isMSVoice(formData.tvoice)) tvoice = formData.tvoice.Name;
+		}
+	});
 
 	function getReaderName(shortName: string, locale: string) {
 		let name = shortName.substring(0, shortName.length - 6);
@@ -45,11 +70,11 @@
 	}
 
 	function handleSrcTryListen() {
-		handleTryListen(formData.svoice)
+		handleTryListen(svoice);
 	}
 
 	function handleTarTryListen() {
-		handleTryListen(formData.tvoice)
+		handleTryListen(tvoice);
 	}
 
 	function isMSVoice(voice: any): voice is MSVoice {
@@ -62,7 +87,15 @@
 		);
 	}
 
-	function handleTryListen(voice: any) {
+	function handleTryListen(voiceName: any) {
+		let voice = {};
+		for (let i = 0; i < voices.length; i++) {
+			const element = voices[i];
+			if (element.Name === voiceName) {
+				voice = element;
+				break;
+			}
+		}
 		if (isMSVoice(voice)) {
 			let readerName: string = getReaderName(voice.ShortName, voice.Locale);
 			translate(
@@ -91,6 +124,15 @@
 
 	// We've created a custom submit function to pass the response and close the modal.
 	function onFormSubmit(): void {
+		for (let i = 0; i < voices.length; i++) {
+			const element = voices[i];
+			if (element.Name === svoice) {
+				formData.svoice = element;
+			}
+			if (element.Name === tvoice) {
+				formData.tvoice = element;
+			}
+		}
 		if ($modalStore[0].response) $modalStore[0].response(formData);
 		modalStore.close();
 	}
@@ -123,9 +165,9 @@
 			</label>
 			<label class="label">
 				<span>母语朗读人</span>
-				<select class="select" bind:value={formData.svoice}>
-					{#each $modalStore[0].meta.ms_readers.filter(slmatches) as v, i}
-						<option value={v}> {getReaderShowName(v)}</option>
+				<select class="select" bind:value={svoice}>
+					{#each voices.filter(slmatches) as v, i}
+						<option value={v.Name}> {getReaderShowName(v)}</option>
 					{/each}
 				</select>
 			</label>
@@ -140,9 +182,9 @@
 			</label>
 			<label class="label">
 				<span>目标朗读人</span>
-				<select class="select" bind:value={formData.tvoice}>
-					{#each $modalStore[0].meta.ms_readers.filter(matches) as v, i}
-						<option value={v}> {getReaderShowName(v)}</option>
+				<select class="select" bind:value={tvoice}>
+					{#each voices.filter(matches) as v, i}
+						<option value={v.Name}> {getReaderShowName(v)}</option>
 					{/each}
 				</select>
 			</label>

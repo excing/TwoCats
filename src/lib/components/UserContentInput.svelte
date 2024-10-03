@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import LanguageSeletct from './LanguageSeletct.svelte';
 	import { UserInputTypes } from './Types';
 	import UserTextInput from './UserTextInput.svelte';
+	import UserSettingsInput from './UserSettingsInput.svelte';
 
 	export let type = UserInputTypes.UserSearchWord;
 
@@ -46,8 +46,8 @@
 		on:searchWord={onSearchWord}
 		on:translateText={onTranslateText}
 	/>
-{:else if type === UserInputTypes.UserSelectMainLanguage}
-	<LanguageSeletct on:content={onContent} />
+{:else if type === UserInputTypes.UserSettings}
+	<UserSettingsInput />
 {:else}
 	<UserTextInput bind:userMessage on:searchWord={onSearchWord} on:translateText={onTranslateText} />
 {/if}

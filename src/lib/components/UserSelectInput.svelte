@@ -13,7 +13,7 @@
 	let userOption: Option;
 
 	$: {
-		userOption = optionList[0];
+		if (!userOption) userOption = optionList[0];
 	}
 
 	function onSendUserOptions(option: Option) {
