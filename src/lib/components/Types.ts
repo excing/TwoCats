@@ -3,3 +3,7 @@ export const UserInputTypes = {
   UserSearchWord: 'user-search-word',
   UserSettings: 'user-settings',
 }
+
+export const ChatTypes = {
+  Text: 'chat-text',
+}
