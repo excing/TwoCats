@@ -22,6 +22,23 @@ export class Message {
     this.type = '';
     this.time = new Date();
   }
+
+  setId(id: number) {
+    this.id = id;
+    return this;
+  }
+
+  copy(m: any) {
+    this.id = m.id;
+    this.uuid = m.uuid;
+    this.cid = m.cdi;
+    this.uid = m.uid;
+    this.user = m.user;
+    this.content = m.content;
+    this.type = m.type;
+    this.time = m.time;
+    return this;
+  }
 }
 
 export class UserSettings {

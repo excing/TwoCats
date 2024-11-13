@@ -89,8 +89,9 @@ const page = (
     const objectStore = db.transaction([storeName]).objectStore(storeName);
 
     // 匹配所有大于指定 id 的，但不包括该 id
-    const lowerBoundOpenKeyRange = v.id ? IDBKeyRange.lowerBound(v.id, true) : null;
-    const request = objectStore.openCursor(lowerBoundOpenKeyRange, 0 <= dir ? 'next' : 'prev');
+    const idBKeyRange = 0 <= dir ? IDBKeyRange.lowerBound(v.id, true) : IDBKeyRange.upperBound(v.id, true);
+    const keyRange = v.id ? idBKeyRange : null;
+    const request = objectStore.openCursor(keyRange, 0 <= dir ? 'next' : 'prev');
     const arr: any[] = [];
     let count = pageCount;
     request.onsuccess = (e) => {

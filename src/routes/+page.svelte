@@ -50,6 +50,22 @@
 
 	onMount(() => {
 		elemChat.style.maxHeight = `${elemChat.clientHeight}px`;
+		elemChat.addEventListener('scroll', (e) => {
+			if (elemChat.scrollTop === 0) {
+				console.log('load prev more');
+				
+				opendb().then(({page, db}: any) => {
+					console.log('load prev more start msg: ', messages[0]);
+
+					return page(db, new Message().copy(messages[0]), -1);
+				}).then(({arr}) => {
+					if (!arr || arr.length <= 0) return;
+
+					messages = [...arr, ...messages];
+					console.log('load prev more success', arr);
+				})
+			}
+		})
 
 		init();
 	});
