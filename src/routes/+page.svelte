@@ -6,6 +6,8 @@
 	import { ChatTypes, UserInputTypes } from '$lib/components/Types';
 	import TextChat from '$lib/components/TextChat.svelte';
 	import { getUserSettings, opendb } from '$lib/db';
+	import { translate } from '$lib/translate';
+	import { franc, francAll } from 'franc';
 
 	const cid = randomUUID();
 
@@ -52,20 +54,22 @@
 		elemChat.style.maxHeight = `${elemChat.clientHeight}px`;
 		elemChat.addEventListener('scroll', (e) => {
 			if (elemChat.scrollTop === 0) {
-				console.log('load prev more');
-				
-				opendb().then(({page, db}: any) => {
-					console.log('load prev more start msg: ', messages[0]);
+				// console.log('load prev more');
 
-					return page(db, new Message().copy(messages[0]), -1);
-				}).then(({arr}) => {
-					if (!arr || arr.length <= 0) return;
+				opendb()
+					.then(({ page, db }: any) => {
+						// console.log('load prev more start msg: ', messages[0]);
 
-					messages = [...arr, ...messages];
-					console.log('load prev more success', arr);
-				})
+						return page(db, new Message().copy(messages[0]), -1);
+					})
+					.then(({ arr }) => {
+						if (!arr || arr.length <= 0) return;
+
+						messages = [...arr, ...messages];
+						// console.log('load prev more success', arr);
+					});
 			}
-		})
+		});
 
 		init();
 	});
@@ -81,14 +85,14 @@
 		msg.user = user;
 		msg.content = event.detail.content;
 		msg.type = event.detail.type;
-		messages = [...messages, msg];
-		// 消息列表置底
-		setTimeout(() => {
-			scrollChatBottom('smooth');
-		}, 0);
 
 		userInputType = UserInputTypes.UserSearchWord;
 		userMessage = '';
+
+		let language = franc(msg.content);
+		language = language === 'cmn' ? 'zh-CN' : language;
+		language = language === 'eng' ? 'en' : language;
+		console.log(msg.content, language);
 
 		opendb()
 			.then(({ insert, db }: any) => {
@@ -96,6 +100,36 @@
 			})
 			.then(() => {
 				console.log('success');
+
+				messages = [...messages, msg];
+				// 消息列表置底
+				setTimeout(() => {
+					scrollChatBottom('smooth');
+				}, 0);
+
+				let sl = language === 'und' ? user.settings.language : language;
+				let tl = system.settings.language;
+				console.log(sl, tl, user.settings, system.settings);
+
+				if (language === system.settings.language) {
+					tl = user.settings.language;
+				}
+
+				return translate(msg.content, sl, tl);
+			})
+			.then(({ text }) => {
+				let msg1 = new Message();
+				msg1.cid = cid;
+				msg1.uid = system.uuid;
+				msg1.user = system;
+				msg1.content = text;
+				msg1.type = '';
+
+				messages = [...messages, msg1];
+				// 消息列表置底
+				setTimeout(() => {
+					scrollChatBottom('smooth');
+				}, 0);
 			});
 	}
 </script>

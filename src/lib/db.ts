@@ -189,3 +189,32 @@ export function opendb() {
     };
   })
 }
+
+const isMessage = (v: any): v is Message => {
+  if (v instanceof Message) return true;
+  return (
+    typeof v.id === 'number' &&
+    typeof v.uuid === 'string' &&
+    typeof v.cid === 'string' &&
+    typeof v.uid === 'string' &&
+    typeof v.content === 'object' &&
+    typeof v.type === 'string' &&
+    typeof v.time === 'object' &&
+    typeof v.user === 'object'
+  );
+}
+
+const isUser = (v: any): v is User => {
+  if (v instanceof User) return true;
+  return (
+    typeof v.id === 'number' &&
+    typeof v.uuid === 'string' &&
+    typeof v.name === 'string' &&
+    typeof v.avatar === 'string' &&
+    typeof v.role === 'string' &&
+    typeof v.type === 'string' &&
+    typeof v.time === 'object' &&
+    typeof v.lasttime === 'object' && 
+    typeof v.settings === 'object'
+  );
+}
