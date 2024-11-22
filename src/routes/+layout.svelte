@@ -95,7 +95,29 @@
 	<!-- if 用户未初始化，则显示用户初始化全屏对话框 -->
 {:else if 3 === style}
 	<!-- Page Route Content -->
-	<slot />
+	<div class="w-full h-full flex flex-col overflow-hidden">
+		<div class=" w-full flex-none z-10">
+			<div class="w-full flex items-center bg-surface-100-800-token p-4">
+				<a href="/" rel="noreferrer" class="">
+					<strong class="text-3xl uppercase">🐱🐱</strong>
+				</a>
+				<div class="flex-1"></div>
+				<div class="flex items-center space-x-2">
+					<a class="btn btn-sm variant-ghost-surface" href="/ft" rel="noreferrer"> Feature </a>
+					<a
+						class="btn btn-sm variant-ghost-surface"
+						href="https://github.com/excing/TwoCats"
+						target="_blank"
+						rel="noreferrer"
+					>
+						GitHub
+					</a>
+					<LightSwitch />
+				</div>
+			</div>
+		</div>
+		<slot />
+	</div>
 {:else}
 	<AppShell>
 		<svelte:fragment slot="header">
