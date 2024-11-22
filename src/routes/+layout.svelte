@@ -93,6 +93,9 @@
 	</div>
 {:else if 1 === style}
 	<!-- if 用户未初始化，则显示用户初始化全屏对话框 -->
+{:else if 3 === style}
+	<!-- Page Route Content -->
+	<slot />
 {:else}
 	<AppShell>
 		<svelte:fragment slot="header">
