@@ -21,21 +21,33 @@ const Name_wordStore = 'words';
 
 export let pageCount = 10; // 数据库查询每页大小
 
+export type AppDB = {
+  insert: (db: IDBDatabase, v: Message | User) => Promise<AppDB>;
+  remove: (db: IDBDatabase, v: Message | User) => Promise<AppDB>;
+  page: (db: IDBDatabase, v: Message | User, dir?: number) => Promise<AppDB>;
+  close: (db: IDBDatabase) => Promise<unknown>;
+  db: IDBDatabase,
+  event: Event,
+  result: any
+}
+
 const insert = (
   db: IDBDatabase,
   v: Message | User,
 ) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<AppDB>((resolve, reject) => {
     let storeName = v instanceof Message ? Name_messageStore : Name_userStore;
     const transaction = db.transaction([storeName], "readwrite");
     const objectStore = transaction.objectStore(storeName);
     const _v = { ...v }
     Reflect.deleteProperty(_v, "id");
     const request = objectStore.put(_v);
-    request.onsuccess = (e) => {
-      resolve(e);
+    request.onsuccess = (event) => {
+      let result = v;
+      resolve({ insert, remove, page, close, db, event, result });
     };
     request.onerror = (e) => {
+      close(db);
       reject(e);
     };
   })
@@ -51,7 +63,7 @@ const remove = (
   db: IDBDatabase,
   v: Message | User,
 ) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<AppDB>((resolve, reject) => {
     let storeName = v instanceof Message ? Name_messageStore : Name_userStore;
 
     const transaction = db.transaction([storeName], "readwrite");
@@ -59,18 +71,22 @@ const remove = (
     if (v.id) {
       const objectStore = transaction.objectStore(storeName);
       const request = objectStore.delete(v.id);
-      request.onsuccess = (e) => {
-        resolve(e);
+      request.onsuccess = (event) => {
+        let result = v;
+        resolve({ insert, remove, page, close, db, event, result });
       };
       request.onerror = (e) => {
+        close(db);
         reject(e);
       };
     } else {
       // 在所有数据添加完毕后的处理
       transaction.oncomplete = (event) => {
-        resolve(event);
+        let result = v;
+        resolve({ insert, remove, page, close, db, event, result });
       };
       transaction.onerror = (event) => {
+        close(db);
         reject(event);
       };
       transaction.objectStore(storeName).deleteIndex(v.type);
@@ -83,7 +99,7 @@ const page = (
   v: Message | User,
   dir: number = 0,
 ) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<AppDB>((resolve, reject) => {
     let storeName = v instanceof Message ? Name_messageStore : Name_userStore;
 
     const objectStore = db.transaction([storeName]).objectStore(storeName);
@@ -92,27 +108,28 @@ const page = (
     const idBKeyRange = 0 <= dir ? IDBKeyRange.lowerBound(v.id, true) : IDBKeyRange.upperBound(v.id, true);
     const keyRange = v.id ? idBKeyRange : null;
     const request = objectStore.openCursor(keyRange, 0 <= dir ? 'next' : 'prev');
-    const arr: any[] = [];
+    const result: any[] = [];
     let count = pageCount;
-    request.onsuccess = (e) => {
+    request.onsuccess = (event) => {
       const cursor = request.result;
       if (cursor) {
         // 对记录进行一些操作。
         if (0 <= dir) { // next 查询时，最新记录在后
-          arr.push(cursor.value);
+          result.push(cursor.value);
         } else {        // prev 查询时，最新记录在前，unshift 将数据插入第一个
-          arr.unshift(cursor.value);
+          result.unshift(cursor.value);
         }
         if (0 === (--count)) {
-          resolve({ arr });
+          resolve({ insert, remove, page, close, db, event, result });
         } else {
           cursor.continue();
         }
       } else {
-        resolve({ arr });
+        resolve({ insert, remove, page, close, db, event, result });
       }
     };
     request.onerror = (e) => {
+      close(db);
       reject(e);
     };
   })
@@ -124,13 +141,14 @@ const close = (db: IDBDatabase,) => {
       console.log('indexeddb closed');
     }
     db.close();
+    resolve(0);
     console.log('indexeddb closing...');
   })
 }
 
 // todo: db 未正确关闭
 export function opendb() {
-  return new Promise((resolve, reject) => {
+  return new Promise<AppDB>((resolve, reject) => {
     let request = window.indexedDB.open("TwoCatsDB", 1);
 
     request.onupgradeneeded = (event) => {
@@ -184,8 +202,9 @@ export function opendb() {
     request.onsuccess = (event) => {
       // 使用 request.result 来做点什么！
       let db = request.result;
+      let result = 'open db successed';
 
-      resolve({ insert, remove, page, close, db });
+      resolve({ insert, remove, page, close, db, event, result });
     };
   })
 }
@@ -214,7 +233,7 @@ const isUser = (v: any): v is User => {
     typeof v.role === 'string' &&
     typeof v.type === 'string' &&
     typeof v.time === 'object' &&
-    typeof v.lasttime === 'object' && 
+    typeof v.lasttime === 'object' &&
     typeof v.settings === 'object'
   );
 }

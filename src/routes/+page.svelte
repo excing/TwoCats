@@ -5,7 +5,7 @@
 	import UserContentInput from '$lib/components/UserContentInput.svelte';
 	import { ChatTypes, UserInputTypes } from '$lib/components/Types';
 	import TextChat from '$lib/components/TextChat.svelte';
-	import { getUserSettings, opendb } from '$lib/db';
+	import { getUserSettings, opendb, type AppDB } from '$lib/db';
 	import { translate } from '$lib/translate';
 	import { franc, francAll } from 'franc';
 
@@ -29,24 +29,26 @@
 
 	const init = () => {
 		opendb()
-			.then(({ page, db }: any) => {
-				return Promise.all([page(db, new User()), page(db, new Message(), -1)]);
+			.then(({ page, db }: AppDB) => {
+				return page(db, new User());
 			})
-			.then((values) => {
-				values[0].arr?.forEach((u: User) => {
+			.then(({ page, db, result }: AppDB) => {
+				result?.forEach((u: User) => {
 					if (u.role === 'user') {
 						user = u;
 					} else if (u.role === 'system') {
 						system = u;
 					}
 				});
-				messages = values[1].arr;
+				return page(db, new Message(), -1);
+			})
+			.then(({ close, db, result }: AppDB) => {
+				messages = result;
+				return close(db);
 			})
 			.then(() => {
 				// 消息列表置底
-				setTimeout(() => {
-					scrollChatBottom('smooth');
-				}, 0);
+				scrollChatBottom('smooth');
 			});
 	};
 
@@ -57,15 +59,17 @@
 				// console.log('load prev more');
 
 				opendb()
-					.then(({ page, db }: any) => {
+					.then(({ page, db }) => {
 						// console.log('load prev more start msg: ', messages[0]);
 
 						return page(db, new Message().copy(messages[0]), -1);
 					})
-					.then(({ arr }) => {
-						if (!arr || arr.length <= 0) return;
+					.then(({ close, db, result }) => {
+						if (!result || result.length <= 0) return;
 
-						messages = [...arr, ...messages];
+						messages = [...result, ...messages];
+
+						close(db);
 						// console.log('load prev more success', arr);
 					});
 			}
@@ -75,7 +79,9 @@
 	});
 
 	function scrollChatBottom(behavior?: ScrollBehavior): void {
-		elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
+		setTimeout(() => {
+			elemChat.scrollTo({ top: elemChat.scrollHeight, behavior });
+		}, 10);
 	}
 
 	function onUserContent(event: CustomEvent) {
@@ -89,23 +95,21 @@
 		userInputType = UserInputTypes.UserSearchWord;
 		userMessage = '';
 
-		let language = franc(msg.content);
+		let langs = francAll(msg.content, { only: ['eng', 'cmn'], minLength: 3 });
+		let language = langs[0][0];
+		console.log();
 		language = language === 'cmn' ? 'zh-CN' : language;
 		language = language === 'eng' ? 'en' : language;
 		console.log(msg.content, language);
 
 		opendb()
-			.then(({ insert, db }: any) => {
+			.then(({ insert, db }) => {
 				return insert(db, msg);
 			})
-			.then(() => {
-				console.log('success');
-
+			.then(async ({ insert, db }) => {
 				messages = [...messages, msg];
 				// 消息列表置底
-				setTimeout(() => {
-					scrollChatBottom('smooth');
-				}, 0);
+				scrollChatBottom('smooth');
 
 				let sl = language === 'und' ? user.settings.language : language;
 				let tl = system.settings.language;
@@ -115,21 +119,18 @@
 					tl = user.settings.language;
 				}
 
-				return translate(msg.content, sl, tl);
-			})
-			.then(({ text }) => {
+				const { text } = await translate(msg.content, sl, tl);
 				let msg1 = new Message();
 				msg1.cid = cid;
 				msg1.uid = system.uuid;
 				msg1.user = system;
 				msg1.content = text;
 				msg1.type = '';
-
-				messages = [...messages, msg1];
-				// 消息列表置底
-				setTimeout(() => {
-					scrollChatBottom('smooth');
-				}, 0);
+				return await insert(db, msg1);
+			})
+			.then(({ result }) => {
+				messages = [...messages, result];
+				scrollChatBottom('smooth');
 			});
 	}
 </script>

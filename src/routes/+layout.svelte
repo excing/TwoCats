@@ -4,7 +4,7 @@
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 
-	import { opendb } from '$lib/db';
+	import { opendb, type AppDB } from '$lib/db';
 	import { User, UserSettings } from '$lib/entity';
 	import { randomUUID } from '$lib/utils';
 
@@ -13,12 +13,13 @@
 
 	onMount(() => {
 		opendb()
-			.then(({ page, db }: any) => {
+			.then(({ page, db }: AppDB) => {
 				return page(db, new User());
 			})
-			.then(({ arr }: any) => {
-				if (0 < arr.length) {
+			.then(({ insert, close, db, result }: AppDB) => {
+				if (0 < result.length) {
 					style = 3;
+					close(db);
 				} else {
 					let user = new User();
 					user.uuid = randomUUID();
@@ -64,13 +65,10 @@
 					};
 					system.settings = systemSettings;
 
-					opendb()
-						.then(({ insert, db }: any) => {
-							return Promise.all([insert(db, user), insert(db, system)]);
-						})
-						.then(() => {
-							style = 3;
-						});
+					Promise.all([insert(db, user), insert(db, system)]).then(() => {
+						style = 3;
+						close(db);
+					});
 				}
 			});
 	});
