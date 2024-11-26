@@ -1,5 +1,5 @@
 import { translate } from "$lib/translate";
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 export async function GET({ url }) {
   const q = url.searchParams.get('q');
@@ -10,7 +10,8 @@ export async function GET({ url }) {
 
   let ggtranslateurl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=rw&dt=ss&dt=rm&dj=1&source=icon&q=${q}`;
 
-  // let resp = await fetch(ggtranslateurl)
+  let resp = await fetch(ggtranslateurl)
+  let jsonobj = await resp.json();
 
-  return await fetch(ggtranslateurl);
+  return json(jsonobj);
 }
