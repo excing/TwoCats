@@ -102,6 +102,14 @@
 		language = language === 'eng' ? 'en' : language;
 		console.log(msg.content, language);
 
+		let sl = language === 'und' ? user.settings.language : language;
+		let tl = system.settings.language;
+		console.log(sl, tl, user.settings, system.settings);
+
+		if (language === system.settings.language) {
+			tl = user.settings.language;
+		}
+
 		opendb()
 			.then(({ insert, db }) => {
 				return insert(db, msg);
@@ -110,14 +118,6 @@
 				messages = [...messages, msg];
 				// 消息列表置底
 				scrollChatBottom('smooth');
-
-				let sl = language === 'und' ? user.settings.language : language;
-				let tl = system.settings.language;
-				console.log(sl, tl, user.settings, system.settings);
-
-				if (language === system.settings.language) {
-					tl = user.settings.language;
-				}
 
 				const { text } = await translate(msg.content, sl, tl);
 				let msg1 = new Message();
