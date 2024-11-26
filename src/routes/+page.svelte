@@ -97,7 +97,6 @@
 
 		let langs = francAll(msg.content, { only: ['eng', 'cmn'], minLength: 3 });
 		let language = langs[0][0];
-		console.log();
 		language = language === 'cmn' ? 'zh-CN' : language;
 		language = language === 'eng' ? 'en' : language;
 		console.log(msg.content, language);

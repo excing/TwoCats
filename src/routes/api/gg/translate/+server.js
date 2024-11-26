@@ -1,4 +1,3 @@
-import { translate } from "$lib/translate";
 import { error, json } from '@sveltejs/kit';
 
 export async function GET({ url }) {
