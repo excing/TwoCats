@@ -24,6 +24,18 @@ const MS_TTS_HEADER = `Content-Type:application/json; charset=utf-8\r\nPath:spee
     }
 }`
 
+export const isMSVoice = (v: any): v is MSVoice => {
+  return (
+    typeof v.Name === 'string' &&
+    typeof v.ShortName === 'string' &&
+    typeof v.Gender === 'string' &&
+    typeof v.Locale === 'string' &&
+    typeof v.SuggestedCodec === 'string' &&
+    typeof v.FriendlyName === 'string' &&
+    typeof v.Status === 'string'
+  );
+}
+
 export type MSVoice = {
   Name: string;
   ShortName: string;
@@ -360,7 +372,7 @@ class SpeechSynthesis {
   }
 }
 
-function generateRandomHex(length = 32) {
+export function generateRandomHex(length = 32) {
   let result = '';
   const characters = 'abcdef0123456789';
   for (let i = 0; i < length; i++) {
@@ -369,7 +381,7 @@ function generateRandomHex(length = 32) {
   return result;
 }
 
-function ssml(requestId: string, text: string, lang: string, voiceName: string, pitch: number, rate: number, volume: number) {
+export function ssml(requestId: string, text: string, lang: string, voiceName: string, pitch: number, rate: number, volume: number) {
   const requestSSML = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${lang}">
   <voice name="${voiceName}">
     <prosody pitch="${pitch}%" rate="${rate}" volume="${volume}">${text}</prosody>

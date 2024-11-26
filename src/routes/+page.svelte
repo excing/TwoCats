@@ -8,6 +8,7 @@
 	import { getUserSettings, opendb, type AppDB } from '$lib/db';
 	import { translate } from '$lib/translate';
 	import { franc, francAll } from 'franc';
+	import { isMSVoice, MSSpeechSynthesisUtterance, speechSynthesis, type MSVoice } from '$lib/synth';
 
 	const cid = randomUUID();
 
@@ -97,17 +98,30 @@
 
 		let langs = francAll(msg.content, { only: ['eng', 'cmn'], minLength: 3 });
 		let language = langs[0][0];
-		language = language === 'cmn' ? 'zh-CN' : language;
-		language = language === 'eng' ? 'en' : language;
-		console.log(msg.content, language);
-
-		let sl = language === 'und' ? user.settings.language : language;
-		let tl = system.settings.language;
-		console.log(sl, tl, user.settings, system.settings);
-
-		if (language === system.settings.language) {
-			tl = user.settings.language;
+		switch (langs[0][0]) {
+			case 'und':
+			case 'cmn':
+				language = 'zh-CN';
+				break;
+			case 'eng':
+				language = 'en';
+			default:
+				break;
 		}
+
+		const userlang = user.settings.language;
+		const syslang = system.settings.language;
+
+		let sl = language;
+		let tl = language === syslang ? userlang : syslang;
+
+		// let voice = language === syslang ? user.settings.voice : system.settings.voice;
+
+		// if (isMSVoice(voice)) {
+		// 	console.log(voice);
+
+		// 	play(msg.content, voice);
+		// }
 
 		opendb()
 			.then(({ insert, db }) => {
