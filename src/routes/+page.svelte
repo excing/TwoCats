@@ -115,13 +115,8 @@
 		let sl = language;
 		let tl = language === syslang ? userlang : syslang;
 
-		// let voice = language === syslang ? user.settings.voice : system.settings.voice;
-
-		// if (isMSVoice(voice)) {
-		// 	console.log(voice);
-
-		// 	play(msg.content, voice);
-		// }
+		let svoice = language === userlang ? user.settings.voice : system.settings.voice;
+		let tvoice = language === syslang ? user.settings.voice : system.settings.voice;
 
 		opendb()
 			.then(({ insert, db }) => {
@@ -144,6 +139,18 @@
 			.then(({ result }) => {
 				messages = [...messages, result];
 				scrollChatBottom('smooth');
+
+				if (isMSVoice(svoice) && isMSVoice(tvoice)) {
+					let audio = new Audio(
+						`https://tts.blendiv.com/ms?q=${msg.content}&lang=${svoice.Locale}&voice=${svoice.ShortName}&pitch=0&rate=1&volume=70`
+					);
+					audio.onended = () => {
+						new Audio(
+							`https://tts.blendiv.com/ms?q=${result.content}&lang=${tvoice.Locale}&voice=${tvoice.ShortName}&pitch=0&rate=1&volume=70`
+						).play();
+					};
+					audio.play();
+				}
 			});
 	}
 </script>
