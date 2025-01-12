@@ -15,8 +15,13 @@ export class TranslateResult {
    * 默认翻译为当前浏览器语言
    */
   tl: string = '';
+  /**
+   * 如果有，则表示该请示内容为单词
+   */
+  dict: Array<any> = [];
 }
 
+// 首先尝试 gg api, 如果请求失败，则请示 ms api.
 export function translate(q: string, sl: string, tl: string, channel: number = TranslaterChannels.Edge) {
   if (TranslaterChannels.Edge == channel) {
     return edgeBrowserTranslate(q, sl, tl);
@@ -273,7 +278,7 @@ export function chromeBrowserTranslate(q: string, sl: string, tl: string) {
     return result;
   }
   return new Promise((resolve: (value: TranslateResult) => void, reject) => {
-    let url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=rw&dt=ss&dt=rm&dj=1&source=icon&q=${q}`;
+    let url = `/api/gg/translate?sl=${sl}&tl=${tl}&q=${q}`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => resolve(toResult(data)))

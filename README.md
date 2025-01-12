@@ -2,6 +2,12 @@
 
 一个外语（英语）学习 APP
 
+## todo list
+
+[ ] gg/ms api 整理为 lib，并可以直接使用
+[ ] 开启至少 3 个 gg/ms 代理服务器，以保证并发
+[ ] 2cats 随机请求一个 gg/ms 代理服务器
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).

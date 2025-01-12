@@ -7,7 +7,14 @@ export async function GET({ url }) {
 
   if (!q || !tl) error(400, 'must have q and tl');
 
-  let ggtranslateurl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=rw&dt=ss&dt=rm&dj=1&source=icon&q=${q}`;
+  let ggtranslateapi = 'https://translate.googleapis.com/translate_a/single';
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    ggtranslateapi = 'https://2cats.blendiv.com/api/gg/translate';
+  }
+
+  let ggtranslateurl = `${ggtranslateapi}?client=gtx&sl=${sl}&tl=${tl}&dt=t&dt=at&dt=bd&dt=ex&dt=md&dt=rw&dt=ss&dt=rm&dj=1&source=icon&q=${q}`;
+
+  // console.log(ggtranslateurl)
 
   let resp = await fetch(ggtranslateurl)
   let jsonobj = await resp.json();

@@ -6,7 +6,7 @@
 	import { ChatTypes, UserInputTypes } from '$lib/components/Types';
 	import TextChat from '$lib/components/TextChat.svelte';
 	import { getUserSettings, opendb, type AppDB } from '$lib/db';
-	import { translate } from '$lib/translate';
+	import { translate, TranslaterChannels } from '$lib/translate';
 	import { franc, francAll } from 'franc';
 	import { isMSVoice, MSSpeechSynthesisUtterance, speechSynthesis, type MSVoice } from '$lib/synth';
 
@@ -127,7 +127,7 @@
 				// 消息列表置底
 				scrollChatBottom('smooth');
 
-				const { text } = await translate(msg.content, sl, tl);
+				const { text } = await translate(msg.content, sl, tl, TranslaterChannels.Chrome);
 				let msg1 = new Message();
 				msg1.cid = cid;
 				msg1.uid = system.uuid;
@@ -140,17 +140,17 @@
 				messages = [...messages, result];
 				scrollChatBottom('smooth');
 
-				if (isMSVoice(svoice) && isMSVoice(tvoice)) {
-					let audio = new Audio(
-						`https://tts.blendiv.com/ms?q=${msg.content}&lang=${svoice.Locale}&voice=${svoice.ShortName}&pitch=0&rate=1&volume=70`
-					);
-					audio.onended = () => {
-						new Audio(
-							`https://tts.blendiv.com/ms?q=${result.content}&lang=${tvoice.Locale}&voice=${tvoice.ShortName}&pitch=0&rate=1&volume=70`
-						).play();
-					};
-					audio.play();
-				}
+				// if (isMSVoice(svoice) && isMSVoice(tvoice)) {
+				// 	let audio = new Audio(
+				// 		`https://tts.blendiv.com/ms?q=${msg.content}&lang=${svoice.Locale}&voice=${svoice.ShortName}&pitch=0&rate=1&volume=70`
+				// 	);
+				// 	audio.onended = () => {
+				// 		new Audio(
+				// 			`https://tts.blendiv.com/ms?q=${result.content}&lang=${tvoice.Locale}&voice=${tvoice.ShortName}&pitch=0&rate=1&volume=70`
+				// 		).play();
+				// 	};
+				// 	audio.play();
+				// }
 			});
 	}
 </script>
