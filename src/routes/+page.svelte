@@ -153,6 +153,21 @@
 				// }
 			});
 	}
+
+	function onRemberWord() {
+		// 记单词
+
+		let msg = new Message();
+		msg.cid = cid;
+		msg.uid = user.uuid;
+		msg.user = user;
+		msg.content = "开始记单词";
+		msg.type = "";
+
+		messages = [...messages, msg];
+
+		scrollChatBottom('smooth');
+	}
 </script>
 
 <title>🐈2Cats🐱 —— 一个多语言学习 APP</title>
@@ -169,6 +184,9 @@
 					{content}
 				/>
 			{/each}
+		</div>
+		<div>
+			<button class="chip variant-filled" on:click={onRemberWord}>记单词</button>
 		</div>
 		<UserContentInput bind:type={userInputType} bind:userMessage on:content={onUserContent} />
 	</div>
