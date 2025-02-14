@@ -1,0 +1,95 @@
+{
+  "sentences": [
+      {
+          "trans": "discuss",
+          "orig": "讨论",
+          "backend": 10
+      },
+      {
+          "src_translit": "Tǎolùn"
+      }
+  ],
+  "dict": [
+      {
+          "pos": "verb",
+          "terms": [
+              "discuss",
+              "talk over"
+          ],
+          "entry": [
+              {
+                  "word": "discuss",
+                  "reverse_translation": [
+                      "讨论",
+                      "论",
+                      "商量",
+                      "商讨",
+                      "谈",
+                      "谈论"
+                  ],
+                  "score": 0.07358052
+              },
+              {
+                  "word": "talk over",
+                  "reverse_translation": [
+                      "讨论",
+                      "相商",
+                      "念叨",
+                      "商量",
+                      "说服",
+                      "计仪"
+                  ],
+                  "score": 0.000032700344
+              }
+          ],
+          "base_form": "讨论",
+          "pos_enum": 2
+      }
+  ],
+  "src": "zh-CN",
+  "alternative_translations": [
+      {
+          "src_phrase": "讨论",
+          "alternative": [
+              {
+                  "word_postproc": "discuss",
+                  "has_preceding_space": true,
+                  "attach_to_next_token": false,
+                  "backends": [
+                      10
+                  ]
+              },
+              {
+                  "word_postproc": "Discussion",
+                  "has_preceding_space": true,
+                  "attach_to_next_token": false,
+                  "backends": [
+                      8
+                  ]
+              }
+          ],
+          "srcunicodeoffsets": [
+              {
+                  "begin": 0,
+                  "end": 2
+              }
+          ],
+          "raw_src_segment": "讨论",
+          "start_pos": 0,
+          "end_pos": 0
+      }
+  ],
+  "confidence": 0,
+  "spell": {},
+  "ld_result": {
+      "srclangs": [
+          "zh-CN"
+      ],
+      "srclangs_confidences": [
+          0
+      ],
+      "extended_srclangs": [
+          "zh-CN"
+      ]
+  }
+}

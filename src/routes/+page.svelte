@@ -9,6 +9,7 @@
 	import { translate, TranslaterChannels } from '$lib/translate';
 	import { franc, francAll } from 'franc';
 	import { isMSVoice, MSSpeechSynthesisUtterance, speechSynthesis, type MSVoice } from '$lib/synth';
+	import DictChat from '$lib/components/DictChat.svelte';
 
 	const cid = randomUUID();
 
@@ -127,13 +128,18 @@
 				// 消息列表置底
 				scrollChatBottom('smooth');
 
-				const { text } = await translate(msg.content, sl, tl, TranslaterChannels.Chrome);
+				const { text, dict } = await translate(msg.content, sl, tl, TranslaterChannels.Chrome);
 				let msg1 = new Message();
 				msg1.cid = cid;
 				msg1.uid = system.uuid;
 				msg1.user = system;
-				msg1.content = text;
-				msg1.type = '';
+				if (dict) {
+					msg1.content = dict;
+					msg1.type = 'dict';
+				} else {
+					msg1.content = text;
+					msg1.type = 'text';
+				}
 				return await insert(db, msg1);
 			})
 			.then(({ result }) => {
@@ -161,8 +167,8 @@
 		msg.cid = cid;
 		msg.uid = user.uuid;
 		msg.user = user;
-		msg.content = "开始记单词";
-		msg.type = "";
+		msg.content = '开始记单词';
+		msg.type = '';
 
 		messages = [...messages, msg];
 
@@ -175,14 +181,32 @@
 	<div class="flex-1"></div>
 	<div style="width: 680px;" class="flex flex-col h-full p-2 space-y-4">
 		<div class="flex-1 overflow-y-auto space-y-4" bind:this={elemChat}>
-			{#each messages as { user, content, time }}
-				<TextChat
-					dir={user.role === 'user' ? 0 : 1}
-					username={user.name}
-					{time}
-					avatar="/favicon.png"
-					{content}
-				/>
+			{#each messages as { user, type, content, time }}
+				{#if type === 'dict'}
+					<DictChat
+						dir={user.role === 'user' ? 0 : 1}
+						{time}
+						{content}
+						on:content={onUserContent}
+					/>
+					<!-- {:else if type === 'text'}
+					<TextChat
+						dir={user.role === 'user' ? 0 : 1}
+						username={user.name}
+						{time}
+						avatar="/favicon.png"
+						{content}
+					/> -->
+				{:else}
+					<TextChat
+						dir={user.role === 'user' ? 0 : 1}
+						username={user.name}
+						{time}
+						avatar="/favicon.png"
+						{content}
+						on:content={onUserContent}
+					/>
+				{/if}
 			{/each}
 		</div>
 		<div>

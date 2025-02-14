@@ -261,6 +261,7 @@ export function chromeBrowserTranslate(q: string, sl: string, tl: string) {
 
   let toResult = function (data: any): TranslateResult {
     let result = new TranslateResult();
+    result.dict = data.dict;
     result.query = q;
     result.sl = data.src;
     result.tl = tl;

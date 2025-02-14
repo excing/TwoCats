@@ -1,0 +1,199 @@
+{
+  "sentences": [
+      {
+          "trans": "过敏的",
+          "orig": "allergic",
+          "backend": 3,
+          "model_specification": [
+              {}
+          ],
+          "translation_engine_debug_info": [
+              {
+                  "model_tracking": {
+                      "checkpoint_md5": "6ffafab0da7e640be86ac09d0d5e539c",
+                      "launch_doc": "en_zh_2023q1.md"
+                  }
+              }
+          ]
+      },
+      {
+          "translit": "Guòmǐn de",
+          "src_translit": "əˈlərjik"
+      }
+  ],
+  "dict": [
+      {
+          "pos": "adjective",
+          "terms": [
+              "对 ... 极讨厌的",
+              "过敏的",
+              "过敏性的",
+              "过敏症的"
+          ],
+          "entry": [
+              {
+                  "word": "对 ... 极讨厌的",
+                  "reverse_translation": [
+                      "allergic"
+                  ]
+              },
+              {
+                  "word": "过敏的",
+                  "reverse_translation": [
+                      "allergic",
+                      "anaphylactic",
+                      "cantankerous",
+                      "excitable",
+                      "grouchy",
+                      "hypersensitive"
+                  ]
+              },
+              {
+                  "word": "过敏性的",
+                  "reverse_translation": [
+                      "allergic"
+                  ]
+              },
+              {
+                  "word": "过敏症的",
+                  "reverse_translation": [
+                      "allergic",
+                      "hypersensitive"
+                  ]
+              }
+          ],
+          "base_form": "allergic",
+          "pos_enum": 3
+      }
+  ],
+  "src": "en",
+  "alternative_translations": [
+      {
+          "src_phrase": "allergic",
+          "alternative": [
+              {
+                  "word_postproc": "过敏的",
+                  "has_preceding_space": true,
+                  "attach_to_next_token": false,
+                  "backends": [
+                      3
+                  ],
+                  "backend_infos": [
+                      {
+                          "backend": 3
+                      }
+                  ]
+              },
+              {
+                  "word_postproc": "过敏体质",
+                  "has_preceding_space": true,
+                  "attach_to_next_token": false,
+                  "backends": [
+                      8
+                  ]
+              }
+          ],
+          "srcunicodeoffsets": [
+              {
+                  "begin": 0,
+                  "end": 8
+              }
+          ],
+          "raw_src_segment": "allergic",
+          "start_pos": 0,
+          "end_pos": 0
+      }
+  ],
+  "confidence": 0.9895833,
+  "spell": {},
+  "ld_result": {
+      "srclangs": [
+          "en"
+      ],
+      "srclangs_confidences": [
+          0.9895833
+      ],
+      "extended_srclangs": [
+          "en"
+      ]
+  },
+  "synsets": [
+      {
+          "pos": "adjective",
+          "entry": [
+              {
+                  "synonym": [
+                      "hypersensitive",
+                      "sensitive",
+                      "susceptible",
+                      "sensitized"
+                  ],
+                  "definition_id": "m_en_gbus0023640.005"
+              },
+              {
+                  "synonym": [
+                      "indisposed"
+                  ],
+                  "definition_id": "m_en_gbus0023640.008",
+                  "label_info": {
+                      "register": [
+                          "informal",
+                          "archaic"
+                      ]
+                  }
+              },
+              {
+                  "synonym": [
+                      "averse",
+                      "opposed",
+                      "hostile",
+                      "inimical",
+                      "antagonistic",
+                      "antipathetic",
+                      "resistant",
+                      "unsympathetic",
+                      "(dead) set against"
+                  ],
+                  "definition_id": "m_en_gbus0023640.008",
+                  "label_info": {
+                      "register": [
+                          "informal"
+                      ]
+                  }
+              }
+          ],
+          "base_form": "allergic",
+          "pos_enum": 3
+      }
+  ],
+  "definitions": [
+      {
+          "pos": "adjective",
+          "entry": [
+              {
+                  "gloss": "caused by or relating to an allergy.",
+                  "definition_id": "m_en_gbus0023640.005",
+                  "example": "an allergic reaction to penicillin"
+              }
+          ],
+          "base_form": "allergic",
+          "pos_enum": 3
+      }
+  ],
+  "examples": {
+      "example": [
+          {
+              "text": "it's just that I'm <b>allergic</b> to the hype",
+              "definition_id": "m_en_gbus0023640.008"
+          },
+          {
+              "text": "Heather was <b>allergic</b> to the sting of bees",
+              "definition_id": "m_en_gbus0023640.007"
+          },
+          {
+              "text": "an <b>allergic</b> reaction to penicillin",
+              "definition_id": "m_en_gbus0023640.005"
+          }
+      ]
+  }
+}
