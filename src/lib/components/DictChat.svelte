@@ -36,19 +36,17 @@
 
 		<div>
 			{#each content as { pos, terms }}
-				<div>
+				<div style="word-break: break-all;">
 					<span style="font-weight: 600;">{pos}.</span>
 
 					{#each terms as term}
 						<!-- <span class="chip variant-filled m-1">{term}</span> -->
-						<a
+						<span class="mx-1"><a
 							style="font-weight: 400;"
-							class="mx-1"
 							href="#{term}"
 							on:click={() => {
 								handleSegment(term);
-							}}
-							>{term};</a>
+							}}>{term}</a>;</span>
 					{/each}
 				</div>
 			{/each}
