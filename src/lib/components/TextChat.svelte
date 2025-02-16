@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Avatar } from '@skeletonlabs/skeleton';
 	import DateTimeText from './DateTimeText.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { UserInputTypes } from './Types';
@@ -7,9 +6,7 @@
 	const dispatch = createEventDispatcher();
 
 	export let dir = 0;
-	export let username = '';
 	export let content: any;
-	export let avatar = '';
 	export let time = new Date();
 
 	function segmentText(text: string) {
@@ -33,6 +30,12 @@
 			content: segmentText
 		});
 	}
+
+	function handlePlayAudio() {
+		dispatch('play', {
+			content: content
+		});
+	}
 </script>
 
 <div class="flex gap-2">
@@ -45,6 +48,16 @@
 	>
 		<header class="flex justify-between items-center">
 			<DateTimeText {time}></DateTimeText>
+
+			<button class="btn-icon btn-icon-sm" on:click={handlePlayAudio}
+				><span class="w-3"
+					><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"
+						><path
+							d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80L0 432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"
+						/></svg
+					></span
+				></button
+			>
 		</header>
 		<p>
 			{#each segmentText(content) as seg}
@@ -54,8 +67,8 @@
 						href="#{seg.segment}"
 						on:click={() => {
 							handleSegment(seg.segment);
-						}}
-						>{seg.segment}</a>
+						}}>{seg.segment}</a
+					>
 				{:else}
 					<span>{seg.segment}</span>
 				{/if}

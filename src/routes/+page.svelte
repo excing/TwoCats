@@ -145,19 +145,38 @@
 			.then(({ result }) => {
 				messages = [...messages, result];
 				scrollChatBottom('smooth');
-
-				// if (isMSVoice(svoice) && isMSVoice(tvoice)) {
-				// 	let audio = new Audio(
-				// 		`https://tts.blendiv.com/ms?q=${msg.content}&lang=${svoice.Locale}&voice=${svoice.ShortName}&pitch=0&rate=1&volume=70`
-				// 	);
-				// 	audio.onended = () => {
-				// 		new Audio(
-				// 			`https://tts.blendiv.com/ms?q=${result.content}&lang=${tvoice.Locale}&voice=${tvoice.ShortName}&pitch=0&rate=1&volume=70`
-				// 		).play();
-				// 	};
-				// 	audio.play();
-				// }
 			});
+	}
+
+	function onPlayContent(event: CustomEvent) {
+		let content = event.detail.content;
+		let voice = contentVoice(content);
+		if (isMSVoice(voice)) {
+			new Audio(
+				`https://pubapi.blendiv.com/ms/tts?text=${content}&lang=${voice.Locale}&voice=${voice.ShortName}&rate=0.7&bearer=602dec30-02a4-4575-9c27-540505caabaf`
+			).play();
+		}
+	}
+
+	function contentVoice(content: string) {
+		let langs = francAll(content, { only: ['eng', 'cmn'], minLength: 3 });
+		let language = langs[0][0];
+		switch (langs[0][0]) {
+			case 'und':
+			case 'cmn':
+				language = 'zh-CN';
+				break;
+			case 'eng':
+				language = 'en';
+			default:
+				break;
+		}
+
+		const userlang = user.settings.language;
+
+		let svoice = language === userlang ? user.settings.voice : system.settings.voice;
+
+		return svoice;
 	}
 
 	function onRemberWord() {
@@ -200,11 +219,10 @@
 				{:else}
 					<TextChat
 						dir={user.role === 'user' ? 0 : 1}
-						username={user.name}
 						{time}
-						avatar="/favicon.png"
 						{content}
 						on:content={onUserContent}
+						on:play={onPlayContent}
 					/>
 				{/if}
 			{/each}
