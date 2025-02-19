@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 
-export async function GET({ url }) {
+export async function GET({ url, request }) {
   const q = url.searchParams.get('q');
   const sl = url.searchParams.get('sl') ?? 'auto';
   const tl = url.searchParams.get('tl') ?? '1';
@@ -16,7 +16,7 @@ export async function GET({ url }) {
 
   // console.log(ggtranslateurl)
 
-  let resp = await fetch(ggtranslateurl)
+  let resp = await fetch(ggtranslateurl, { method: 'GET', headers: request.headers })
   let jsonobj = await resp.json();
 
   return json(jsonobj);
